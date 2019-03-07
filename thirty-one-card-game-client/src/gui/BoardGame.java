@@ -5,6 +5,7 @@ import java.awt.SystemColor;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import listeners.CardButtonListener;
 
@@ -15,9 +16,10 @@ public class BoardGame {
     private JButton[] cardButtons;
     private JLabel[] cardRemainLabes;
     private JLabel turnLabel;
+    private JLabel scoreLabel;
     private int[] remainCards;
-    private boolean myTurn;
-
+    private int sum = 0;
+    
     // singleton class
     static public BoardGame getInstance() {
         if (instance == null) {
@@ -31,6 +33,7 @@ public class BoardGame {
         cardButtons = new JButton[6];
         cardRemainLabes = new JLabel[6];
         turnLabel = new JLabel("Your Turn");
+        scoreLabel = new JLabel("0");
         remainCards = new int[6];
 
         initialize();
@@ -65,6 +68,9 @@ public class BoardGame {
         turnLabel.setForeground(SystemColor.green);
 
         mainFrame.getContentPane().add(turnLabel);
+        
+        scoreLabel.setBounds(10, 250, 100, 15);
+        mainFrame.getContentPane().add(scoreLabel);
     }
 
     public void setVisible(Boolean arg0) {
@@ -74,25 +80,24 @@ public class BoardGame {
     public boolean update(int cardNumber, Boolean myTurn) {
 
         int idx = cardNumber - 1;
-        int sum = 0;
 
         if (remainCards[idx] == 0) {
             System.out.println("Cards cannot be less than zero");
             return false;
         }
+        
+        sum += cardNumber;
+        
+        scoreLabel.setText("Score = " + sum);
 
         remainCards[idx]--;
         cardRemainLabes[idx].setText(String.valueOf(remainCards[idx]));
-
-        for (int i = 0; i < 6; i++) {
-            cardButtons[i].setEnabled(!myTurn);
-            sum += (4 - remainCards[i]) * (i + 1);
-        }
 
         setTurn(myTurn);
 
         if (this.isGameOver(sum, myTurn)) {
             System.out.print("Game Over");
+            JOptionPane.showMessageDialog(null, "Game Over");
             return true;
         }
 
@@ -100,8 +105,6 @@ public class BoardGame {
     }
 
     public void setTurn(boolean myTurn) {
-        this.myTurn = myTurn;
-
         if (myTurn) {
             turnLabel.setText("Rival's Turn");
             turnLabel.setForeground(SystemColor.red);

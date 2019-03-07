@@ -1,6 +1,5 @@
 package client;
 
-import gui.BoardGame;
 import java.net.Socket;
 import gui.Game;
 import java.io.DataInputStream;
@@ -20,9 +19,9 @@ public class ClientMain {
 			e.printStackTrace();
 		}
                 ClientRun runnable = new ClientRun(socket);
+        		new Game(socket);
                 Thread t = new Thread(runnable);
                 t.start();
-		new Game(socket);
 	}
 	
 }
@@ -45,7 +44,11 @@ class ClientRun implements Runnable {
     public void run() {
         try {
             while(true){
-                Game.getInstance().update(dataInputStream.readInt(),false);
+            	String msg = dataInputStream.readUTF();
+            	String[] msgs = msg.split("_");
+            	System.out.println(msgs[0] + " " + msgs[1]);
+            	int cardNumber = Integer.parseInt(msgs[1]);
+                Game.getInstance().update(cardNumber, false);
             }
         } catch (IOException ex) {
                 Logger.getLogger(ClientRun.class.getName()).log(Level.SEVERE, null, ex);

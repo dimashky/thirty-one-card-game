@@ -23,10 +23,10 @@ public class ServerMain {
         }
 
         ServerRun runnable = new ServerRun(client);
+        new Game(client);
+        
         Thread t = new Thread(runnable);
         t.start();
-        new Game(client);
-
     }
 
 }
@@ -48,8 +48,13 @@ class ServerRun implements Runnable {
     @Override
     public void run() {
         try {
+            int cardNumber = 0;
             while (true) {
-                Game.getInstance().update(dataInputStream.readInt(), false);
+            	String msg = dataInputStream.readUTF();
+            	String[] msgs = msg.split("_");
+                cardNumber = Integer.parseInt(msgs[1]);
+                System.out.println("card selected from Socket " + cardNumber);
+            	Game.getInstance().update(cardNumber, false);
             }
         } catch (IOException ex) {
             Logger.getLogger(ServerRun.class.getName()).log(Level.SEVERE, null, ex);

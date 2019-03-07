@@ -21,7 +21,7 @@ public class CardButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent arg0) {
         BoardGame.getInstance().update(cardNumber, true);
         try {
-            Game.getInstance().send(cardNumber);
+            Game.getInstance().send("CARD_" + cardNumber);
         } catch (IOException ex) {
             Logger.getLogger(CardButtonListener.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -20,13 +20,13 @@ public class Game {
     }
 
     public Game(Socket client) throws IOException {
-        this.client = client;
+        Game.client = client;
         dos = new DataOutputStream(client.getOutputStream());
         initGame(true);
     }
 
-    public void send(int cardNumber) throws IOException {
-        dos.writeInt(cardNumber);
+    public void send(String msg) throws IOException {
+        dos.writeUTF(msg);
     }
 
     public void update(int cardNumber, boolean turn) {
@@ -39,7 +39,7 @@ public class Game {
                 try {
                     board = BoardGame.getInstance();
                     board.setVisible(true);
-                    board.setTurn(turn);
+                    board.setTurn(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
