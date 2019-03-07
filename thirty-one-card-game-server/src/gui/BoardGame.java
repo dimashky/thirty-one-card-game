@@ -6,6 +6,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BoardGame {
 
@@ -15,8 +17,11 @@ public class BoardGame {
     private JLabel[] cardRemainLabes;
     private JLabel turnLabel;
     private JLabel scoreLabel;
+    private JLabel timerLabel;
     private int[] remainCards;
     private int sum = 0;
+    private Timer time = new Timer();
+    private boolean myTurn = true;
 
     // singleton class
     static public BoardGame getInstance() {
@@ -33,6 +38,7 @@ public class BoardGame {
         turnLabel = new JLabel("Your Turn");
         turnLabel.setForeground(SystemColor.green);
         scoreLabel = new JLabel("Score = 0");
+        timerLabel = new JLabel("");
         remainCards = new int[6];
 
         initialize();
@@ -63,11 +69,16 @@ public class BoardGame {
             remainCards[i] = 4;
         }
 
+        updateTimer(10);
+
         turnLabel.setBounds(10, 220, 100, 15);
         mainFrame.getContentPane().add(turnLabel);
 
-        scoreLabel.setBounds(10, 250, 100, 15);
+        scoreLabel.setBounds(10 + 110 * 2, 220, 100, 15);
         mainFrame.getContentPane().add(scoreLabel);
+
+        timerLabel.setBounds(10 + 110 * 4, 220, 100, 15);
+        mainFrame.getContentPane().add(timerLabel);
     }
 
     public void setVisible(Boolean arg0) {
@@ -82,6 +93,7 @@ public class BoardGame {
             System.out.println("Cards cannot be less than zero");
             return false;
         }
+        updateTimer(10);
 
         sum += cardNumber;
 
@@ -94,7 +106,11 @@ public class BoardGame {
 
         if (this.isGameOver(sum, myTurn)) {
             System.out.print("Game Over");
+            updateTimer(0);
             JOptionPane.showMessageDialog(null, "Game Over");
+            for (int i = 0; i < 6; i++) {
+                cardButtons[i].setEnabled(false);
+            }
             return true;
         }
 
@@ -102,6 +118,7 @@ public class BoardGame {
     }
 
     public void setTurn(boolean myTurn) {
+
         if (myTurn) {
             turnLabel.setText("Rival's Turn");
             turnLabel.setForeground(SystemColor.red);
@@ -113,7 +130,57 @@ public class BoardGame {
         for (int i = 0; i < 6; i++) {
             cardButtons[i].setEnabled(!myTurn);
         }
+
+        this.myTurn = !myTurn;
     }
+
+    private void updateTimer(int interval_arg){
+
+        int delay = 1000;
+        int period = 1000;
+        time.cancel();
+        time.purge();
+        time = new Timer();
+
+        timerLabel.setText(String.valueOf(interval_arg));
+
+        BoardGame board = this;
+
+        time.scheduleAtFixedRate(new TimerTask() {
+
+            int interval = interval_arg;
+
+            public void run() {
+                if (interval == 0) {
+                    timerLabel.setText("Time Finished");
+                    time.cancel();
+                    time.purge();
+
+                    if(!myTurn){
+                        return;
+                    }
+
+                    for(int i = 0; i < 6; ++i) {
+                        if(board.remainCards[i] > 0) {
+                            board.update(i+1, true);
+                            try {
+                                Game.getInstance().send("CARD_" + (i+1));
+                            } catch (Exception ex) {
+
+                            }
+
+                            return;
+                        }
+                    }
+
+                } else {
+                    interval--;
+                    timerLabel.setText("" + interval);
+                }
+            }
+        }, delay, period);
+    }
+
 
     private Boolean isGameOver(int sum, boolean turn) {
         if (sum < 31) {

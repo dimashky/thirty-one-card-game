@@ -39,7 +39,7 @@ public class Game {
                 try {
                     board = BoardGame.getInstance();
                     board.setVisible(true);
-                    board.setTurn(true);
+                    //board.setTurn(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
