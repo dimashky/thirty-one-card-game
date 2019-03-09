@@ -156,7 +156,7 @@ public class BoardGame {
                     time.cancel();
                     time.purge();
 
-                    if(!myTurn){
+                    if(!myTurn || board.sum >= 31){
                         return;
                     }
 
