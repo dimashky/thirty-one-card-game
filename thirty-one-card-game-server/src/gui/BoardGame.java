@@ -22,6 +22,8 @@ public class BoardGame {
     private int sum = 0;
     private Timer time = new Timer();
     private boolean myTurn = true;
+    private JButton surrenderButton;
+    private JButton rematchButton;
 
     // singleton class
     static public BoardGame getInstance() {
@@ -40,7 +42,9 @@ public class BoardGame {
         scoreLabel = new JLabel("Score = 0");
         timerLabel = new JLabel("");
         remainCards = new int[6];
-
+        surrenderButton = new JButton("Surrender");
+        rematchButton = new JButton("Rematch");
+        
         initialize();
     }
 
@@ -51,11 +55,14 @@ public class BoardGame {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.getContentPane().setLayout(null);
 
+        mainFrame.addWindowListener(new CloseWindowListener());
+        
+        //TODO: Why initialize here and in constructor
         cardButtons = new JButton[6];
         cardRemainLabes = new JLabel[6];
 
         for (int i = 0; i < 6; ++i) {
-            cardButtons[i] = new JButton(new Integer(i + 1).toString());
+            cardButtons[i] = new JButton(Integer.toString(i + 1));
             cardButtons[i].setBackground(SystemColor.control);
             cardButtons[i].setBounds(10 + 110 * i, 10, 100, 160);
             mainFrame.getContentPane().add(cardButtons[i]);
@@ -69,7 +76,7 @@ public class BoardGame {
             remainCards[i] = 4;
         }
 
-        updateTimer(10);
+        updateTimer(30);
 
         turnLabel.setBounds(10, 220, 100, 15);
         mainFrame.getContentPane().add(turnLabel);
@@ -79,6 +86,15 @@ public class BoardGame {
 
         timerLabel.setBounds(10 + 110 * 4, 220, 100, 15);
         mainFrame.getContentPane().add(timerLabel);
+        
+        surrenderButton.setBounds(10 + 110 * 5, 220, 100, 15);
+        mainFrame.getContentPane().add(surrenderButton);
+        surrenderButton.addActionListener(new SurrenderButtonListener());
+        
+        rematchButton.setBounds(10 + 110 * 5, 240, 100, 15);
+        mainFrame.getContentPane().add(rematchButton);
+        rematchButton.addActionListener(new RematchButtonListener());
+
     }
 
     public void setVisible(Boolean arg0) {
@@ -93,7 +109,7 @@ public class BoardGame {
             System.out.println("Cards cannot be less than zero");
             return false;
         }
-        updateTimer(10);
+        updateTimer(30);
 
         sum += cardNumber;
 
@@ -107,7 +123,8 @@ public class BoardGame {
         if (this.isGameOver(sum, myTurn)) {
             System.out.print("Game Over");
             updateTimer(0);
-            JOptionPane.showMessageDialog(null, "Game Over");
+            //TODO here i move the dialog
+//            JOptionPane.showMessageDialog(null, "Game Over");
             for (int i = 0; i < 6; i++) {
                 cardButtons[i].setEnabled(false);
             }
@@ -196,5 +213,41 @@ public class BoardGame {
         }
         return true;
     }
+
+    public void finishTheGame(int cardNumber){
+        time.cancel();
+        int idx = cardNumber - 1;
+        sum += cardNumber;
+        scoreLabel.setText("Score = " + sum);
+
+        remainCards[idx]--;
+        cardRemainLabes[idx].setText(String.valueOf(remainCards[idx]));
+
+        setTurn(false);
+        turnLabel.setText("You Win");
+        JOptionPane.showMessageDialog(null, "Game Over");
+
+    }
+    
+    public void rivalSurrender() {
+        time.cancel();
+        for (int i = 0; i < 6; i++) {
+            cardButtons[i].setEnabled(false);
+        }
+        surrenderButton.setEnabled(false);
+        turnLabel.setText("You Win, Rival Surrender");
+        turnLabel.setForeground(SystemColor.CYAN);
+    }
+    
+    public void stopTimer(){
+        time.cancel();
+        for (int i = 0; i < 6; i++) {
+            cardButtons[i].setEnabled(false);
+        }
+        surrenderButton.setEnabled(false);
+        turnLabel.setText("You Surrendered");
+        turnLabel.setForeground(SystemColor.MAGENTA);
+    }
+
 
 }

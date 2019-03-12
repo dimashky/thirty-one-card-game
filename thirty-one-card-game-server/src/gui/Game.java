@@ -35,6 +35,14 @@ public class Game {
         BoardGame.getInstance().update(cardNumber, turn);
     }
 
+    public void finishTheGame(int cardNumber){
+        BoardGame.getInstance().finishTheGame(cardNumber);
+    }
+    
+    public void rivalSurrender() {
+        BoardGame.getInstance().rivalSurrender();
+    }
+    
     public void initGame(boolean turn) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
