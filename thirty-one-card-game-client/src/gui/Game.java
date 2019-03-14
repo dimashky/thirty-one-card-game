@@ -7,7 +7,7 @@ import java.net.Socket;
 
 public class Game {
 
-    private static Game instance;
+    private static Game instance = null;
     public BoardGame board;
     private static Socket client;
     DataOutputStream dos;
@@ -20,6 +20,7 @@ public class Game {
     }
 
     public Game(Socket client) throws IOException {
+        instance = this;
         Game.client = client;
         dos = new DataOutputStream(client.getOutputStream());
         initGame(true);
@@ -37,22 +38,9 @@ public class Game {
         BoardGame.getInstance().finishTheGame(cardNumber);
     }
     
-    public void rivalSurrender() {
-        BoardGame.getInstance().rivalSurrender();
-    }
-    
     public void initGame(boolean turn) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    board = BoardGame.getInstance();
-                    board.setVisible(true);
-                    //board.setTurn(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        board = BoardGame.getInstance();
+        board.setVisible(true);      
     }
 
 }

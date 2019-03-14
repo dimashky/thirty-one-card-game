@@ -1,11 +1,13 @@
 package server;
 
+import gui.BoardGame;
 import java.net.ServerSocket;
 
 import gui.Game;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import javax.swing.JOptionPane;
 
 public class ServerMain {
 
@@ -29,28 +31,41 @@ public class ServerMain {
 
         while (!disconnect) {
             String msg = dataInputStream.readUTF();
+            System.out.println(msg);
             String[] msgs = msg.split("_");
             switch(msgs[0]){
                 case "CARD":
                     Game.getInstance().update(Integer.parseInt(msgs[1]), false);
                     break;
-                case "REMATCH":
                     
+                case "REMATCH":
+                    int confirm = JOptionPane.showConfirmDialog(null, "Rematch ?!!");
+                    if(confirm == 0){
+                        Game.getInstance().send("REMATCHACCEPT_");
+                        BoardGame.getInstance().rematch(true);
+                    }
                     break;
+                    
+                case "REMATCHACCEPT":                    
+                    BoardGame.getInstance().rematch(false);
+                    break;
+                    
                 case "SURRENDER":
-                    Game.getInstance().rivalSurrender();
+                    BoardGame.getInstance().surrender(false);
                     break;
+                    
                 case "GAMEOVER":
                     Game.getInstance().finishTheGame(Integer.parseInt(msgs[1]));
                     break;
+                    
                 case "CLOSEWINDOW" :
                     disconnect = true;
                     System.out.println("Disconnected");
-                    //TODO: Show Disconnected not surrender
-                    Game.getInstance().rivalSurrender();
+                    BoardGame.getInstance().disconnected();
                     return;
+                    
                 default:
-                    System.out.println("kdlkfdlk");
+                    System.out.println("DEFAULT !!");
             }
             
         }

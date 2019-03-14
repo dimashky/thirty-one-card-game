@@ -66,6 +66,7 @@ public class BoardGame {
         }
         
         mainFrame.setTitle("Client");
+        mainFrame.setResizable(false);
         mainFrame.setBounds(100, 100, 700, 400);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.getContentPane().setLayout(null);
@@ -132,6 +133,25 @@ public class BoardGame {
         this.mainFrame.setVisible(arg0);
     }
 
+    public void rematch(Boolean turn){
+        
+        for(int i =0; i < 6; i++){
+            remainCards[i] = 4;
+            cardRemainLabes[i].setText(String.valueOf(remainCards[i]));
+             try {
+                Image img = ImageIO.read(new FileInputStream("resources/c"+(i+1)+".bmp"));
+                cardButtons[i].setIcon(new ImageIcon(img));
+              } catch (Exception ex) {
+                System.out.println("EXCEPTION " + ex.toString());
+              }
+        }
+        updateTimer(30);
+        setTurn(turn);
+        rematchButton.setEnabled(false);
+        sum = 0;
+        scoreLabel.setText("Score = " + 0);
+    }
+    
     public boolean update(int cardNumber, Boolean myTurn) {
 
         int idx = cardNumber - 1;
@@ -163,10 +183,11 @@ public class BoardGame {
         if (this.isGameOver(sum, myTurn)) {
             System.out.print("Game Over");
             updateTimer(0);
-            JOptionPane.showMessageDialog(null, "Game Over");
+
             for (int i = 0; i < 6; i++) {
                 cardButtons[i].setEnabled(false);
             }
+            rematchButton.setEnabled(true);
             return true;
         }
 
@@ -183,13 +204,18 @@ public class BoardGame {
             turnLabel.setForeground(SystemColor.green);
         }
 
-        for (int i = 0; i < 6; i++) {
-        	cardButtons[i].setEnabled(!myTurn);
-        }
+        setEnableAllButtons(!myTurn);
         
         this.myTurn = !myTurn;
     }
 
+    private void setEnableAllButtons(boolean enable){
+        for (int i = 0; i < 6; i++) {
+            cardButtons[i].setEnabled(enable);
+        }
+        surrenderButton.setEnabled(enable);
+    }
+    
     private void updateTimer(int interval_arg){
 
         int delay = 1000;
@@ -266,27 +292,30 @@ public class BoardGame {
         setTurn(false);
         
         turnLabel.setText("You Win");
+        surrenderButton.setEnabled(false);
+        rematchButton.setEnabled(true);
         JOptionPane.showMessageDialog(null, "Game Over");
         
     }
     
-    public void rivalSurrender() {
+    public void disconnected(){
         time.cancel();
-        for (int i = 0; i < 6; i++) {
-            cardButtons[i].setEnabled(false);
-        }
-        surrenderButton.setEnabled(false);
-        turnLabel.setText("You Win, Rival Surrender");
-        turnLabel.setForeground(SystemColor.CYAN);
+        setEnableAllButtons(false);
+        rematchButton.setEnabled(false);
+        turnLabel.setText("Rival Disconnected");
+        turnLabel.setForeground(SystemColor.PINK);
     }
     
-    public void stopTimer(){
+    public void surrender(Boolean turn){
         time.cancel();
-        for (int i = 0; i < 6; i++) {
-            cardButtons[i].setEnabled(false);
+        setEnableAllButtons(false);
+        rematchButton.setEnabled(true);
+        if(turn){
+            turnLabel.setText("You Surrendered");
+            turnLabel.setForeground(SystemColor.MAGENTA);
+        }else{
+            turnLabel.setText("You Win, Rival Surrender");
+            turnLabel.setForeground(SystemColor.CYAN);
         }
-        surrenderButton.setEnabled(false);
-        turnLabel.setText("You Surrendered");
-        turnLabel.setForeground(SystemColor.MAGENTA);
     }
 }

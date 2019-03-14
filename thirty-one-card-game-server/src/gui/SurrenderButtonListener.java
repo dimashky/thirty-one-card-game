@@ -13,8 +13,7 @@ public class SurrenderButtonListener implements ActionListener{
     public void actionPerformed(ActionEvent ae) {
         try {
             Game.getInstance().send("SURRENDER_");
-            //TODO
-            BoardGame.getInstance().stopTimer();
+            BoardGame.getInstance().surrender(true);
         } catch (IOException ex) {
             Logger.getLogger(SurrenderButtonListener.class.getName()).log(Level.SEVERE, null, ex);
         }

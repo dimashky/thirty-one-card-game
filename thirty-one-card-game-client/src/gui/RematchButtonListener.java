@@ -14,6 +14,7 @@ public class RematchButtonListener implements ActionListener{
         try {
             //TODO add action to game board
             Game.getInstance().send("REMATCH");
+            
         } catch (IOException ex) {
             Logger.getLogger(RematchButtonListener.class.getName()).log(Level.SEVERE, null, ex);
         }
